@@ -1,0 +1,39 @@
+# Summary result
+
+###  Summary table
+```{r,echo=FALSE}
+options(warn = -1)
+library(data.table)
+library(ggplot2)
+library(Rmisc)
+library(plyr)
+dat = dat
+dd = dat[,2:dim(dat)[2]]
+func <- function(x){c("Total_number" = length(x),"Missing_number" = length(x[is.na(x)]),"Mean"=mean(x,na.rm = T),"Variance"=var(x,na.rm = T),"SD"=sd(x,na.rm = T),"CV"=sd(x,na.rm = T)/mean(x,na.rm = T)*100)}
+
+sm <- as.data.frame(t(apply(dd,2,func)))
+sm
+```
+
+
+## Plot
+```{r,echo=FALSE}
+dat.list = NULL
+titles = NULL
+name = names(dd)
+dd = as.data.frame(dd)
+for( i in 1:dim(dd)[2]){
+  dat.list[[i]] = data.frame(value = dd[,i])
+  titles[[i]] = ggtitle(name[i])
+}
+
+for( i in 1:dim(dd)[2]){
+  # i = 1
+  a = ggplot(dat.list[[i]],aes(value)) + geom_histogram(na.rm = T,colour="black",fill="red")+
+    titles[[i]] +  theme(plot.title = element_text(hjust = 0.5))
+  b = ggplot(dat.list[[i]],aes(x="Boxplot",value)) + geom_boxplot(na.rm = T,colour="black",fill="red")+
+    titles[[i]] +  theme(plot.title = element_text(hjust = 0.5))
+  multiplot(a,b,cols =2)
+}
+
+```
