@@ -1,24 +1,25 @@
 # Summary result
 
 ###  Summary table
-```{r,echo=FALSE}
+```{r results='asis', echo=FALSE, message=FALSE, warning=FALSE}
 options(warn = -1)
 library(data.table)
 library(ggplot2)
 library(Rmisc)
 library(plyr)
+library(xtable)
 dat = dat
 dd = dat[,2:dim(dat)[2]]
 func <- function(x){c("Total_number" = length(x),"Missing_number" = length(x[is.na(x)]),"Mean"=mean(x,na.rm = T),"Variance"=var(x,na.rm = T),"SD"=sd(x,na.rm = T),"CV"=sd(x,na.rm = T)/mean(x,na.rm = T)*100)}
 
 sm <- as.data.frame(t(apply(dd,2,func)))
-sm
+print(xtable(sm),type='html')
 options(warn = 0)
 ```
 
 
 ## Plot
-```{r,echo=FALSE}
+```{r echo=FALSE, message=FALSE, warning=FALSE}
 options(warn = -1)
 dat.list = NULL
 titles = NULL
