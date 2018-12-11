@@ -13,7 +13,7 @@ dd = dat[,2:dim(dat)[2]]
 func <- function(x){c("Total_number" = length(x),"Missing_number" = length(x[is.na(x)]),"Mean"=mean(x,na.rm = T),"Variance"=var(x,na.rm = T),"SD"=sd(x,na.rm = T),"CV"=sd(x,na.rm = T)/mean(x,na.rm = T)*100)}
 
 sm <- as.data.frame(t(apply(dd,2,func)))
-print(xtable(sm),type='html')
+print(xtable(sm),type='html',comment=FALSE)
 options(warn = 0)
 ```
 
