@@ -13,11 +13,13 @@ func <- function(x){c("Total_number" = length(x),"Missing_number" = length(x[is.
 
 sm <- as.data.frame(t(apply(dd,2,func)))
 sm
+options(warn = 0)
 ```
 
 
 ## Plot
 ```{r,echo=FALSE}
+options(warn = -1)
 dat.list = NULL
 titles = NULL
 name = names(dd)
@@ -35,5 +37,5 @@ for( i in 1:dim(dd)[2]){
     titles[[i]] +  theme(plot.title = element_text(hjust = 0.5))
   multiplot(a,b,cols =2)
 }
-
+options(warn = 0)
 ```
