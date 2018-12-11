@@ -10,7 +10,7 @@ ui <- dashboardPage(
       a(img(src="kps.logo.png",height=96,width=210),href="http://www.kangpusen.com/AboutUs/"),
       br(),
       br(),
-      menuItem("ped文件ID转换",tabName = "a", icon = icon("caret-square-right")),
+      menuItem("ped文件转换ID",tabName = "a", icon = icon("caret-square-right")),
       menuItem("计算近交系数和亲缘关系系数",tabName = "b", icon = icon("caret-square-right")),
       menuItem("表型数据汇总统计",tabName = "c", icon = icon("caret-square-right"))
       
