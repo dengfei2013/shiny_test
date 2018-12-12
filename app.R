@@ -119,7 +119,7 @@ server <- function(input, output) {
       dat = d2()
       options(warn=-1)
       pped = prepPed(dat)
-      id = pped[,1]
+      id = as.data.frame(pped)[,1]
       options(warn=0)
       A = makeA(pped)
       A1 = as.matrix(A)
@@ -139,8 +139,8 @@ server <- function(input, output) {
       options(warn=0)
       A = makeA(pped)
       A1 = as.matrix(A)
-      # id = as.vector(pped[,1])
-      # dimnames(A1) = list(c(id),c(id))
+      id = as.data.frame(pped)[,1]
+      dimnames(A1) = list(c(id),c(id))
       re = mat_2_coefficient(A1)
       fwrite(re, file)
     }
