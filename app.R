@@ -133,24 +133,16 @@ server <- function(input, output) {
       paste("data-", Sys.time(), "cofficient.csv", sep=" ")
     },
     content = function(file) {
-      dat = d2()
+      ped = d2()
       options(warn=-1)
-      pped = prepPed(dat)
+      pped = prepPed(ped)
       options(warn=0)
       A = makeA(pped)
       A1 = as.matrix(A)
-      n = dim(A1)[1]
-      re = matrix(0,n,n)
-      for( a in 1:n){
-        for(b in a:n){
-          re[a,b] = A1[a,b]/(sqrt(A1[a,a]*A1[b,b]))
-          re[b,a] = re[a,b]
-        }
-      }
-      id = pped[,1]
-      n = dim(re)[1]
-      result = data.frame(row = rep(id,each=n),col = rep(id,n),y = as.vector(re))
-      fwrite(result, file)
+      # id = as.vector(pped[,1])
+      # dimnames(A1) = list(c(id),c(id))
+      re = mat_2_coefficient(A1)
+      fwrite(re, file)
     }
   )
   
