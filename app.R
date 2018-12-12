@@ -1,6 +1,8 @@
 library(shiny)
 library(shinydashboard)
 library(data.table)
+library(learnasreml)
+library(nadiv)
 
 ui <- dashboardPage(
   dashboardHeader(title = "康普森农业分析平台"),
@@ -27,9 +29,13 @@ ui <- dashboardPage(
     
     tabItem(tabName = "b",
             fileInput("dat2","上传三列系谱数据",accept = ".csv"),                         
-            tableOutput('dat2'),
-            h5("结果文件\n"),
-            downloadButton("down2", "下载近交系数及亲缘关系系数")
+            tableOutput('head2'),
+            h5("近交系数结果文件\n"),
+            downloadButton("down2_1", "下载近交系数csv"),
+            br(),
+            br(),
+            h5("亲缘关系系数结果文件\n"),
+            downloadButton("down2_2", "下载亲缘关系系数csv")
             ),
     
     tabItem(tabName = "c",
@@ -74,14 +80,14 @@ server <- function(input, output) {
     dat1[1:5,1:5]
   })
   
-  output$head2 <- renderTable({
+  output$head1_2 <- renderTable({
     dat2 <- d1_2()
     head(dat2)
   })
   
   output$head2 <- renderTable({
     dat1 <- d2()
-    dat1[1:5,1:5]
+    head(dat1)
   })
   
   output$head3 <- renderTable({
@@ -95,8 +101,8 @@ server <- function(input, output) {
       paste("data-", Sys.time(), ".ped", sep=" ")
     },
     content = function(file) {
-      dat1 <- d1()
-      dat2 = d2()
+      dat1 = d1_1()
+      dat2 = d1_2()
       x = match(dat1$V2,dat2$sample)
       work = sum(is.na(x))
       dat1$V2 = dat2$pigid[x]
@@ -104,6 +110,51 @@ server <- function(input, output) {
       fwrite(re, file,sep = " ")
     }
   )
+  
+  output$down2_1 <- downloadHandler(
+    filename = function() {
+      paste("data-", Sys.time(), "inbreeding.csv", sep=" ")
+    },
+    content = function(file) {
+      dat = d2()
+      options(warn=-1)
+      pped = prepPed(dat)
+      id = pped[,1]
+      options(warn=0)
+      A = makeA(pped)
+      A1 = as.matrix(A)
+      re = data.frame(ID = id,inbreeding = c(diag(A1) -1))
+      fwrite(re, file)
+    }
+  )
+  
+  output$down2_2 <- downloadHandler(
+    filename = function() {
+      paste("data-", Sys.time(), "cofficient.csv", sep=" ")
+    },
+    content = function(file) {
+      dat = d2()
+      options(warn=-1)
+      pped = prepPed(dat)
+      options(warn=0)
+      A = makeA(pped)
+      A1 = as.matrix(A)
+      n = dim(A1)[1]
+      re = matrix(0,n,n)
+      for( a in 1:n){
+        for(b in a:n){
+          re[a,b] = A1[a,b]/(sqrt(A1[a,a]*A1[b,b]))
+          re[b,a] = re[a,b]
+        }
+      }
+      id = pped[,1]
+      n = dim(re)[1]
+      result = data.frame(row = rep(id,each=n),col = rep(id,n),y = as.vector(re))
+      fwrite(result, file)
+    }
+  )
+  
+
   
   output$down3 <- downloadHandler(
     filename = function() {
