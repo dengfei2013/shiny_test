@@ -52,7 +52,7 @@ ui <- dashboardPage(
             br('1, 表型数据, 第一列为ID, 第二列以后为观测值, 不限制性状数'),
             br('2, 上传完数据, 自动分析, 下载数据结果即可.结果文件可以下载html和word版'),
             br(),
-            fileInput("dat3","上次表型数据",accept = ".csv"),                         
+            fileInput("dat3","上传表型数据",accept = ".csv"),                         
             tableOutput('head3'),
             h5("结果文件\n"),
             downloadButton("down3", "下载数据汇总报表html"),
