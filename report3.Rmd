@@ -1,5 +1,22 @@
-## Plot
-```{r echo=FALSE}
+## pedigree summary
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+library(data.table)
 library(visPedigree)
-tidyped(dat)
+ped = dat
+ped[ped==0] = NA
+id = ped[,1]
+sire = ped[,2]
+dam = ped[,3]
+try(tidyped(ped),silent = T)
 ```
+
+### duplicate ID
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+id[duplicated(id)]
+```
+
+### One use both as Sire and Dam 
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+intersect(sire,dam)
+```
+

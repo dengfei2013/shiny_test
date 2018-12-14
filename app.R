@@ -79,8 +79,6 @@ ui <- dashboardPage(
             br('3, 检查是否存在系谱循环Pedigree loop，即个体互为祖先和后裔；如果存在，给出提示并停止运行程序；'),
             br('4, 将未包括在个体列的奠基者个体加入到系谱中，并将其双亲设置为丢失值NA；'),
             br(),
-            # actionButton("goButton", "Go!"),
-            # tableOutput('print')
             downloadButton("down5", "下载数据汇总报表html")
     )
   )
