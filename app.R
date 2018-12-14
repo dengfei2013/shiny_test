@@ -3,6 +3,7 @@ library(shinydashboard)
 library(data.table)
 library(learnasreml)
 library(nadiv)
+library(visPedigree)
 
 ui <- dashboardPage(
   dashboardHeader(title = "康普森农业分析平台"),
@@ -14,13 +15,14 @@ ui <- dashboardPage(
       br(),
       menuItem("ped文件转换ID",tabName = "a", icon = icon("caret-square-right")),
       menuItem("计算近交系数和亲缘关系系数",tabName = "b", icon = icon("caret-square-right")),
-      menuItem("表型数据汇总统计",tabName = "c", icon = icon("caret-square-right"))
+      menuItem("表型数据汇总统计",tabName = "c", icon = icon("caret-square-right")),
+      menuItem("检查系谱是否有问题",tabName = "d", icon = icon("caret-square-right"))
       
     )),
   dashboardBody(
     tabItems(
     tabItem(tabName = "a",
-            h4('使用指南'),
+            h4('1, ped ID替换使用指南'),
             br('1, ped文件第一列编号,第二列是需要替换的ID,第三列以后为SNP数据;'),
             br('2, ID文件第一列为ped文件中需要替换的ID, 第二列为正确的ID;\n'),
             br('3, 上传完数据, 自动分析, 下载数据结果即可.'),
@@ -33,7 +35,7 @@ ui <- dashboardPage(
             downloadButton("down1", "下载处理后的ped文件")),
     
     tabItem(tabName = "b",
-            h4('系谱近交系数使用指南'),
+            h4('2, 系谱近交系数使用指南'),
             br('1, 上传系谱文件, 系谱文件包括三列:ID, Sire, Dam'),
             br('2, 上传完数据, 自动分析, 下载数据结果即可.'),
             br(),
@@ -48,7 +50,7 @@ ui <- dashboardPage(
             ),
     
     tabItem(tabName = "c",
-            h4('汇总数据使用指南'),
+            h4('3, 汇总数据使用指南'),
             br('1, 表型数据, 第一列为ID, 第二列以后为观测值, 不限制性状数'),
             br('2, 上传完数据, 自动分析, 下载数据结果即可.结果文件可以下载html和word版'),
             br(),
@@ -61,7 +63,26 @@ ui <- dashboardPage(
             downloadButton("downa", "汇总统计Excel"),
             br(),
             downloadButton("down4", "下载数据汇总报表word")
-            )
+            ),
+    
+    tabItem(tabName = "d",
+            h4('4, 检查系谱程序'),
+            br('1, 上传系谱文件, 系谱文件包括三列:ID, Sire, Dam'),
+            br('2, 上传完数据, 自动分析'),
+            br(),
+            fileInput("dat4","上传表型数据",accept = ".csv"),    
+            
+            h4("系谱是否错误, 可以检查的类型包括以下"),
+            br(),
+            br('1, 检查系谱是否存在重复个体编号；如果存在，删除重复个体，并给出提示'),
+            br('2, 检查是否存在同时做父本和母本的个体；如果存在，给出提示'),
+            br('3, 检查是否存在系谱循环Pedigree loop，即个体互为祖先和后裔；如果存在，给出提示并停止运行程序；'),
+            br('4, 将未包括在个体列的奠基者个体加入到系谱中，并将其双亲设置为丢失值NA；'),
+            br(),
+            # actionButton("goButton", "Go!"),
+            # tableOutput('print')
+            downloadButton("down5", "下载数据汇总报表html")
+    )
   )
 ))
 
@@ -93,6 +114,12 @@ server <- function(input, output) {
     fread(inFile3$datapath)
   })
   
+  d4 <- reactive({
+    inFile3 <- input$dat4
+    if (is.null(inFile3)) return(NULL)
+    fread(inFile3$datapath)
+  })
+  
   output$head1_1 <- renderTable({
     dat1 <- d1_1()
     dat1[1:5,1:5]
@@ -113,6 +140,7 @@ server <- function(input, output) {
     head(dat2)
   })
   
+
 
   output$down1 <- downloadHandler(
     filename = function() {
@@ -209,6 +237,21 @@ server <- function(input, output) {
       file.copy(src, 'report2.Rmd', overwrite = TRUE)
       library(rmarkdown)
       out <- render('report2.Rmd', word_document())
+      file.rename(out, file)
+    })
+  
+  output$down5 <- downloadHandler(
+    filename = function() {
+      paste('Data-summary', Sys.time(), sep = '.', 'html')
+    },
+    content = function(file) {
+      dat = d4()
+      src <- normalizePath('report3.Rmd')
+      owd <- setwd(tempdir())
+      on.exit(setwd(owd))
+      file.copy(src, 'report3.Rmd', overwrite = TRUE)
+      library(rmarkdown)
+      out <- render('report3.Rmd', html_document())
       file.rename(out, file)
     })
   

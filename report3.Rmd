@@ -1,0 +1,5 @@
+## Plot
+```{r echo=FALSE}
+library(visPedigree)
+tidyped(dat)
+```
