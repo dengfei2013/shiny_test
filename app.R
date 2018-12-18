@@ -150,7 +150,7 @@ server <- function(input, output) {
       work = sum(is.na(x))
       dat1$V2 = dat2$pigid[x]
       re = dat1
-      fwrite(re, file,sep = " ")
+      fwrite(re, file,sep = " ",col.names = FALSE)
     }
   )
   
