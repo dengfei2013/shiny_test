@@ -3,7 +3,6 @@ library(shinydashboard)
 library(data.table)
 library(learnasreml)
 library(nadiv)
-library(visPedigree)
 
 ui <- dashboardPage(
   dashboardHeader(title = "康普森农业分析平台"),
