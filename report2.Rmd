@@ -4,10 +4,12 @@ library(data.table)
 library(ggplot2)
 library(Rmisc)
 library(plyr)
+library(xtable)
+dat = dat
+dd = dat[,2:dim(dat)[2]]
 options(warn = -1)
 dat.list = NULL
 titles = NULL
-dd = dat
 name = names(dd)
 dd = as.data.frame(dd)
 for( i in 1:dim(dd)[2]){
