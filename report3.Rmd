@@ -1,7 +1,6 @@
 ## pedigree summary
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
 library(data.table)
-library(visPedigree)
 ped = dat
 ped[ped==0] = NA
 id = ped[,1]
