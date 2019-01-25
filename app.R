@@ -80,11 +80,23 @@ ui <- dashboardPage(
                             downloadButton("down5", "下载数据汇总报表html")
                             ),       
                    tabPanel("加拿大100Kg日龄矫正和背膘厚矫正",
-                            h4('5, 矫正公式'),
+                            br(),
+                            br(),
+                            fileInput("dat5","上传表型数据",accept = ".csv"),   
+                            br(),
+                            downloadButton("down5_a", "下载转化后的数据csv"),
+                            br(),
+                            br(),
+                            h4('加拿大100Kg日龄矫正和背膘厚矫正公式'),
+                            br('1, 行头名是: animalID	breed	birthdate	sex	testdate	weight	beakfat'),
+                            br('2, breed为:YY, LL, DD, HP'),
+                            br('3, sex为:F或者M'),
+                            br('4, birthdate和testdate为日期格式, 可以缺失'),
+                            br('5, weight为体重,beakfat为背膘,可以缺失'),
                             br(),
                             br(),
                             h4('矫正日龄计算公式'),
-                            img(src="ad01.png"),
+                            img(src="ad01.png",height=200,width=510),
                             br(),
                             br(),
                             h4('矫正背膘厚计算公式'),
@@ -92,12 +104,7 @@ ui <- dashboardPage(
                             br(),
                             br(),
                             h4('数据格式'),
-                            img(src="ad03.png"),
-                            br(),
-                            br(),
-                            fileInput("dat5","上传表型数据",accept = ".csv"),   
-                            br(),
-                            downloadButton("down5_a", "下载转化后的数据csv")
+                            img(src="ad03.png")
                             )
                    )),
     tabItem(tabName = "b",
@@ -476,91 +483,7 @@ server <- function(input, output) {
     content = function(file) {
       dat = d5()
       options(warn=-1)
-      dat$d100_2_days = NA
-      head(dat)
-      dat$animalID=as.factor(dat$animalID)
-      dat$breed = as.factor(dat$breed)
-      dat$sex = as.factor(dat$sex)
-      dat$birthdate = as.Date(dat$birthdate)
-      dat$testdate = as.Date(dat$testdate)
-      
-      
-      if(!is.null(as.numeric(dat$testdate - dat$birthdate))){
-        if(dat$sex == "F"){
-          CF = (dat$weight/as.numeric(dat$testdate - dat$birthdate))*1.82604
-          dat$d100_2_days = as.numeric(dat$testdate - dat$birthdate) - (dat$weight-100)/CF
-        }else if(dat$sex == "M"){
-          CF = (dat$weight/as.numeric(dat$testdate - dat$birthdate))*1.714615
-          dat$d100_2_days = as.numeric(dat$testdate - dat$birthdate) - (dat$weight-100)/CF
-        }else{
-          dat$d100_2_days=NA
-        }
-      }else{
-        dat$d100_2_days=NA
-      }
-      
-      BF = data.frame(Cul=rep(c("DB","CB","HPX","DLK"),each=2),
-                      Sex = rep(c("M","F"),4),
-                      A = c(12.402,13.706,12.826,13.983,13.113,14.288,13.468,15.654),
-                      B = c(0.10653,0.119624,0.114379,0.126014,0.11762,0.124425,0.111528,0.156646))
-      dat$d100_2_BF = NA
-      if(dat$breed == "DB"){
-        if(dat$sex == "M"){
-          Av = BF[BF$Cul=="DB"&BF$Sex == "M",]$A
-          Bv = BF[BF$Cul=="DB"&BF$Sex == "M",4]
-          CF = Av/(Av+(Bv*(dat$weight-100)))
-          dat$d100_2_BF = dat$beakfat*CF
-        }else if(dat$sex == "F"){
-          Av = BF[BF$Cul=="DB"&BF$Sex == "F",3]
-          Bv = BF[BF$Cul=="DB"&BF$Sex == "F",4]
-          CF = Av/(Av+(Bv*(dat$weight-100)))
-          dat$d100_2_BF = dat$beakfat*CF
-        }else{
-          dat$d100_2_BF = NA
-        }
-      }else if(dat$breed == "CB"){
-        if(dat$sex == "M"){
-          Av = BF[BF$Cul=="CB"&BF$Sex == "M",]$A
-          Bv = BF[BF$Cul=="CB"&BF$Sex == "M",4]
-          CF = Av/(Av+(Bv*(dat$weight-100)))
-          dat$d100_2_BF = dat$beakfat*CF
-        }else if(dat$sex == "F"){
-          Av = BF[BF$Cul=="CB"&BF$Sex == "F",3]
-          Bv = BF[BF$Cul=="CB"&BF$Sex == "F",4]
-          CF = Av/(Av+(Bv*(dat$weight-100)))
-          dat$d100_2_BF = dat$beakfat*CF
-        }else{
-          dat$d100_2_BF = NA
-        }
-      }else if(dat$breed == "HPX"){
-        if(dat$sex == "M"){
-          Av = BF[BF$Cul=="HPX"&BF$Sex == "M",]$A
-          Bv = BF[BF$Cul=="HPX"&BF$Sex == "M",4]
-          CF = Av/(Av+(Bv*(dat$weight-100)))
-          dat$d100_2_BF = dat$beakfat*CF
-        }else if(dat$sex == "F"){
-          Av = BF[BF$Cul=="HPX"&BF$Sex == "F",3]
-          Bv = BF[BF$Cul=="HPX"&BF$Sex == "F",4]
-          CF = Av/(Av+(Bv*(dat$weight-100)))
-          dat$d100_2_BF = dat$beakfat*CF
-        }else{
-          dat$d100_2_BF = NA
-        }
-      }else if(dat$breed == "DLK"){
-        if(dat$sex == "M"){
-          Av = BF[BF$Cul=="DLK"&BF$Sex == "M",]$A
-          Bv = BF[BF$Cul=="DLK"&BF$Sex == "M",4]
-          CF = Av/(Av+(Bv*(dat$weight-100)))
-          dat$d100_2_BF = dat$beakfat*CF
-        }else if(dat$sex == "F"){
-          Av = BF[BF$Cul=="DLK"&BF$Sex == "F",3]
-          Bv = BF[BF$Cul=="DLK"&BF$Sex == "F",4]
-          CF = Av/(Av+(Bv*(dat$weight-100)))
-          dat$d100_2_BF = dat$beakfat*CF
-        }else{
-          dat$d100_2_BF = NA
-        }
-      }
+      source("adjust.R",local = TRUE)
       fwrite(dat, file)
       options(warn=1)
     }
