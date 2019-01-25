@@ -483,7 +483,7 @@ server <- function(input, output) {
     content = function(file) {
       dat = d5()
       options(warn=-1)
-      source("adjust.R",local = TRUE)
+      source("./adjust.R",local = TRUE)
       fwrite(dat, file)
       # options(warn=1)
     }
