@@ -78,6 +78,26 @@ ui <- dashboardPage(
                             br('4, 将未包括在个体列的奠基者个体加入到系谱中，并将其双亲设置为丢失值NA；'),
                             br(),
                             downloadButton("down5", "下载数据汇总报表html")
+                            ),       
+                   tabPanel("100Kg日龄转化和背膘厚转化",
+                            h4('5, 转化公式'),
+                            br(),
+                            br(),
+                            h4('矫正日龄计算公式'),
+                            a(img(src="ad01.png",height=200,width=410)),
+                            br(),
+                            br(),
+                            h4('矫正背膘厚计算公式'),
+                            a(img(src="ad02.png",height=200,width=410)),
+                            br(),
+                            br(),
+                            h4('数据格式'),
+                            a(img(src="ad03.png",height=200,width=410)),
+                            br(),
+                            br(),
+                            fileInput("dat5","上传表型数据",accept = ".csv"),   
+                            br(),
+                            downloadButton("down5_a", "下载转化后的数据csv")
                             )
                    )),
     tabItem(tabName = "b",
@@ -265,7 +285,7 @@ ui <- dashboardPage(
                      fileInput("d_dat4x_5","上传表型数据",accept = ".csv"), 
                      br(),
                      br(),
-                     downloadButton("d_down5x_5", "下载数据汇总报表html"),
+                     downloadButton("d_down5x_5", "下载转化后的数据csv"),
                      br()
             )
             ))
@@ -304,6 +324,12 @@ server <- function(input, output) {
   
   d4 <- reactive({
     inFile3 <- input$dat4
+    if (is.null(inFile3)) return(NULL)
+    fread(inFile3$datapath)
+  })
+  
+  d5 <- reactive({
+    inFile3 <- input$dat5
     if (is.null(inFile3)) return(NULL)
     fread(inFile3$datapath)
   })
@@ -442,6 +468,103 @@ server <- function(input, output) {
       out <- render('report3.Rmd', html_document())
       file.rename(out, file)
     })
+  
+  output$down5_a <- downloadHandler(
+    filename = function() {
+      paste("data-", Sys.time(), "Adjust.csv", sep=" ")
+    },
+    content = function(file) {
+      dat = d5()
+      options(warn=-1)
+      dat$d100_2_days = NA
+      head(dat)
+      dat$animalID=as.factor(dat$animalID)
+      dat$breed = as.factor(dat$breed)
+      dat$sex = as.factor(dat$sex)
+      dat$birthdate = as.Date(dat$birthdate)
+      dat$testdate = as.Date(dat$testdate)
+      
+      
+      if(!is.null(as.numeric(dat$testdate - dat$birthdate))){
+        if(dat$sex == "F"){
+          CF = (dat$weight/as.numeric(dat$testdate - dat$birthdate))*1.82604
+          dat$d100_2_days = as.numeric(dat$testdate - dat$birthdate) - (dat$weight-100)/CF
+        }else if(dat$sex == "M"){
+          CF = (dat$weight/as.numeric(dat$testdate - dat$birthdate))*1.714615
+          dat$d100_2_days = as.numeric(dat$testdate - dat$birthdate) - (dat$weight-100)/CF
+        }else{
+          dat$d100_2_days=NA
+        }
+      }else{
+        dat$d100_2_days=NA
+      }
+      
+      BF = data.frame(Cul=rep(c("DB","CB","HPX","DLK"),each=2),
+                      Sex = rep(c("M","F"),4),
+                      A = c(12.402,13.706,12.826,13.983,13.113,14.288,13.468,15.654),
+                      B = c(0.10653,0.119624,0.114379,0.126014,0.11762,0.124425,0.111528,0.156646))
+      dat$d100_2_BF = NA
+      if(dat$breed == "DB"){
+        if(dat$sex == "M"){
+          Av = BF[BF$Cul=="DB"&BF$Sex == "M",]$A
+          Bv = BF[BF$Cul=="DB"&BF$Sex == "M",4]
+          CF = Av/(Av+(Bv*(dat$weight-100)))
+          dat$d100_2_BF = dat$beakfat*CF
+        }else if(dat$sex == "F"){
+          Av = BF[BF$Cul=="DB"&BF$Sex == "F",3]
+          Bv = BF[BF$Cul=="DB"&BF$Sex == "F",4]
+          CF = Av/(Av+(Bv*(dat$weight-100)))
+          dat$d100_2_BF = dat$beakfat*CF
+        }else{
+          dat$d100_2_BF = NA
+        }
+      }else if(dat$breed == "CB"){
+        if(dat$sex == "M"){
+          Av = BF[BF$Cul=="CB"&BF$Sex == "M",]$A
+          Bv = BF[BF$Cul=="CB"&BF$Sex == "M",4]
+          CF = Av/(Av+(Bv*(dat$weight-100)))
+          dat$d100_2_BF = dat$beakfat*CF
+        }else if(dat$sex == "F"){
+          Av = BF[BF$Cul=="CB"&BF$Sex == "F",3]
+          Bv = BF[BF$Cul=="CB"&BF$Sex == "F",4]
+          CF = Av/(Av+(Bv*(dat$weight-100)))
+          dat$d100_2_BF = dat$beakfat*CF
+        }else{
+          dat$d100_2_BF = NA
+        }
+      }else if(dat$breed == "HPX"){
+        if(dat$sex == "M"){
+          Av = BF[BF$Cul=="HPX"&BF$Sex == "M",]$A
+          Bv = BF[BF$Cul=="HPX"&BF$Sex == "M",4]
+          CF = Av/(Av+(Bv*(dat$weight-100)))
+          dat$d100_2_BF = dat$beakfat*CF
+        }else if(dat$sex == "F"){
+          Av = BF[BF$Cul=="HPX"&BF$Sex == "F",3]
+          Bv = BF[BF$Cul=="HPX"&BF$Sex == "F",4]
+          CF = Av/(Av+(Bv*(dat$weight-100)))
+          dat$d100_2_BF = dat$beakfat*CF
+        }else{
+          dat$d100_2_BF = NA
+        }
+      }else if(dat$breed == "DLK"){
+        if(dat$sex == "M"){
+          Av = BF[BF$Cul=="DLK"&BF$Sex == "M",]$A
+          Bv = BF[BF$Cul=="DLK"&BF$Sex == "M",4]
+          CF = Av/(Av+(Bv*(dat$weight-100)))
+          dat$d100_2_BF = dat$beakfat*CF
+        }else if(dat$sex == "F"){
+          Av = BF[BF$Cul=="DLK"&BF$Sex == "F",3]
+          Bv = BF[BF$Cul=="DLK"&BF$Sex == "F",4]
+          CF = Av/(Av+(Bv*(dat$weight-100)))
+          dat$d100_2_BF = dat$beakfat*CF
+        }else{
+          dat$d100_2_BF = NA
+        }
+      }
+      fwrite(dat, file)
+      options(warn=1)
+    }
+  )
   
 }
 
