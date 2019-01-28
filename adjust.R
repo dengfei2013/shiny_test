@@ -1,4 +1,3 @@
-
 dat$d100_2_days = NA
 head(dat)
 dat$animalID=as.factor(dat$animalID)

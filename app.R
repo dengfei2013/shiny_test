@@ -370,6 +370,7 @@ server <- function(input, output) {
     content = function(file) {
       dat1 = d1_1()
       dat2 = d1_2()
+      names(dat2) = c("sample","pigid")
       x = match(dat1$V2,dat2$sample)
       work = sum(is.na(x))
       dat1$V2 = dat2$pigid[x]
