@@ -490,8 +490,8 @@ server <- function(input, output) {
       dat$animalID=as.factor(dat$animalID)
       dat$breed = as.factor(dat$breed)
       dat$sex = as.factor(dat$sex)
-      dat$birthdate = as.Date(dat$birthdate)
-      dat$testdate = as.Date(dat$testdate)
+      dat$birthdate = as.numeric(dat$birthdate)
+      dat$testdate = as.numeric(dat$testdate)
       
       
       if(!is.null(as.numeric(dat$testdate - dat$birthdate))){
