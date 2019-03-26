@@ -35,6 +35,7 @@ ui <- dashboardPage(
                             downloadButton("down1", "下载处理后的ped文件")
                             ),
                    tabPanel("计算近交系数和亲缘关系系数",
+                            downloadButton("ex2","下载示例数据"),
                             h4('2, 系谱近交系数使用指南'),
                             br('1, 上传系谱文件, 系谱文件包括三列:ID, Sire, Dam'),
                             br('2, 上传完数据, 自动分析, 下载数据结果即可.'),
@@ -49,6 +50,7 @@ ui <- dashboardPage(
                             downloadButton("down2_2", "下载亲缘关系系数csv")
                             ),
                    tabPanel("表型数据汇总统计",
+                            downloadButton("ex3","下载示例数据"),
                             h4('3, 汇总数据使用指南'),
                             br('1, 表型数据, 第一列为ID, 第二列以后为观测值, 不限制性状数'),
                             br('2, 上传完数据, 自动分析, 下载数据结果即可.结果文件可以下载html和word版'),
@@ -80,6 +82,7 @@ ui <- dashboardPage(
                             downloadButton("down5", "下载数据汇总报表html")
                             ),       
                    tabPanel("加拿大100Kg日龄矫正和背膘厚矫正",
+                            # downloadButton("ex5","下载示例数据"),
                             br(),
                             br(),
                             fileInput("dat5","上传表型数据",accept = ".csv"),   
@@ -361,11 +364,38 @@ server <- function(input, output) {
     head(dat2)
   })
   
-
+  output$ex2 <- downloadHandler(
+    filename = function() {
+      paste("系谱示例数据",".csv", sep="")
+    },
+    content = function(file) {
+      ID <- c("X","B","A","C","D","E","H","G","I")
+      Sire <- c("B","E","C","E","E","H",0,0,0)
+      Dam <- c("A",0,"D",0,"G","G","I","I",0)
+      ped <- data.frame(ID,Sire,Dam)
+      fwrite(ped, file)
+    }
+  )
+  
+  output$ex3 <- downloadHandler(
+    filename = function() {
+      paste("表型示例数据", ".csv", sep="")
+    },
+    content = function(file) {
+      y1 = rnorm(50,3,1)
+      y2 = rnorm(50,30,10)
+      y3 = rnorm(50,30,10)
+      y4 = rnorm(50,30,10)
+      y5 = rnorm(50,30,10)
+      dat <- data.frame(y1=y1,y2=y2,y3=y3,y4=y4,y5=y5)
+      fwrite(dat, file)
+    }
+  )
+  
 
   output$down1 <- downloadHandler(
     filename = function() {
-      paste("data-", Sys.time(), ".ped", sep=" ")
+      paste(strsplit(basename(input$dat1_1$name),split = ".",fixed = T)[[1]][1], Sys.time(), ".ped", sep="")
     },
     content = function(file) {
       dat1 = d1_1()
@@ -381,7 +411,7 @@ server <- function(input, output) {
   
   output$down2_1 <- downloadHandler(
     filename = function() {
-      paste("data-", Sys.time(), "inbreeding.csv", sep=" ")
+      paste(strsplit(basename(input$dat2$name),split = ".",fixed = T)[[1]][1], Sys.time(), "inbreeding.csv", sep="")
     },
     content = function(file) {
       dat = d2()
@@ -398,7 +428,7 @@ server <- function(input, output) {
   
   output$down2_2 <- downloadHandler(
     filename = function() {
-      paste("data-", Sys.time(), "cofficient.csv", sep=" ")
+      paste(strsplit(basename(input$dat2$name),split = ".",fixed = T)[[1]][1], Sys.time(), "cofficient.csv", sep="")
     },
     content = function(file) {
       ped = d2()
@@ -418,7 +448,7 @@ server <- function(input, output) {
   
   output$down3 <- downloadHandler(
     filename = function() {
-      paste('Data-summary', Sys.time(), sep = '.', 'html')
+      paste(strsplit(basename(input$dat3$name),split = ".",fixed = T)[[1]][1], Sys.time(), sep = '', '.html')
     },
     content = function(file) {
       dat = d3()
@@ -433,7 +463,7 @@ server <- function(input, output) {
   
   output$downa <- downloadHandler(
     filename = function() {
-      paste("data-", Sys.time(), ".csv", sep="")
+      paste(strsplit(basename(input$dat3$name),split = ".",fixed = T)[[1]][1], Sys.time(), ".csv", sep="")
     },
     content = function(file) {
       dat = d3()
@@ -449,7 +479,7 @@ server <- function(input, output) {
   
   output$down4 <- downloadHandler(
     filename = function() {
-      paste('Data-summary', Sys.time(), sep = '.', 'doc')
+      paste(strsplit(basename(input$dat3$name),split = ".",fixed = T)[[1]][1], Sys.time(), sep = '.', 'doc')
     },
     content = function(file) {
       dat = d3()
@@ -464,7 +494,7 @@ server <- function(input, output) {
   
   output$down5 <- downloadHandler(
     filename = function() {
-      paste('Data-summary', Sys.time(), sep = '.', 'html')
+      paste(strsplit(basename(input$dat4$name),split = ".",fixed = T)[[1]][1], Sys.time(), '.html',sep = '')
     },
     content = function(file) {
       dat = d4()
@@ -479,7 +509,7 @@ server <- function(input, output) {
   
   output$down5_a <- downloadHandler(
     filename = function() {
-      paste("data-", Sys.time(), "Adjust.csv", sep=" ")
+      paste(strsplit(basename(input$dat5$name),split = ".",fixed = T)[[1]][1], Sys.time(), "Adjust.csv", sep=" ")
     },
     content = function(file) {
       dat = d5()
