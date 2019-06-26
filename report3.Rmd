@@ -19,3 +19,8 @@ id[duplicated(id)]
 intersect(sire,dam)
 ```
 
+### summary
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+library(learnasreml)
+check_pedigree(ped)
+```
